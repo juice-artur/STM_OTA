@@ -76,6 +76,7 @@
   */
 
 #include "stm32g4xx.h"
+#include "FlashLayout.h"
 
 #if !defined(HSE_VALUE)
 #define HSE_VALUE 24000000U /*!< Value of the External oscillator in Hz */
@@ -104,10 +105,9 @@
 /************************* Miscellaneous Configuration ************************/
 /* Note: Following vector table addresses must be defined in line with linker
          configuration. */
-/*!< Uncomment the following line if you need to relocate the vector table
-     anywhere in Flash or Sram, else the vector table is kept at the automatic
-     remap of boot address selected */
-/* #define USER_VECT_TAB_ADDRESS */
+/* Application vector table relocation for the OTA layout. */
+#define USER_VECT_TAB_ADDRESS
+#define VECT_TAB_OFFSET APP_VECTOR_TABLE_OFFSET
 
 #if defined(USER_VECT_TAB_ADDRESS)
 /*!< Uncomment the following line if you need to relocate your vector Table
@@ -125,9 +125,9 @@
 
 #if !defined(VECT_TAB_OFFSET)
 #define VECT_TAB_OFFSET                                                        \
-	0x00000000U /*!< Vector Table offset field.
+	APP_VECTOR_TABLE_OFFSET /*!< Vector Table offset field.
                                                      This value must be a multiple of 0x200. */
-#endif       /* VECT_TAB_OFFSET */
+#endif                   /* VECT_TAB_OFFSET */
 
 #endif /* USER_VECT_TAB_ADDRESS */
 /******************************************************************************/

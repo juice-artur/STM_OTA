@@ -1,53 +1,52 @@
 /*
-******************************************************************************
-**
-
-**  File        : LinkerScript.ld
-**
-**  Author		: STM32CubeMX
-**
-**  Abstract    : Linker script for STM32G431CBTx series
-**                128Kbytes FLASH and 32Kbytes RAM
-**
-**                Set heap size, stack size and stack location according
-**                to application requirements.
-**
-**                Set memory bank area and size if external memory is used.
-**
-**  Target      : STMicroelectronics STM32
-**
-**  Distribution: The file is distributed “as is,” without any warranty
-**                of any kind.
-**
-*****************************************************************************
-** @attention
-**
-** <h2><center>&copy; COPYRIGHT(c) 2025 STMicroelectronics</center></h2>
-**
-** Redistribution and use in source and binary forms, with or without modification,
-** are permitted provided that the following conditions are met:
-**   1. Redistributions of source code must retain the above copyright notice,
-**      this list of conditions and the following disclaimer.
-**   2. Redistributions in binary form must reproduce the above copyright notice,
-**      this list of conditions and the following disclaimer in the documentation
-**      and/or other materials provided with the distribution.
-**   3. Neither the name of STMicroelectronics nor the names of its contributors
-**      may be used to endorse or promote products derived from this software
-**      without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-** FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-** DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-** CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-** OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-*****************************************************************************
-*/
+ ******************************************************************************
+ **
+ **  File        : STM32G431xx_FLASH.ld.in
+ **
+ **  Author		: STM32CubeMX
+ **
+ **  Abstract    : Linker script template for STM32G431CBTx series
+ **                128Kbytes FLASH and 32Kbytes RAM
+ **
+ **                Set heap size, stack size and stack location according
+ **                to application requirements.
+ **
+ **                Set memory bank area and size if external memory is used.
+ **
+ **  Target      : STMicroelectronics STM32
+ **
+ **  Distribution: The file is distributed “as is,” without any warranty
+ **                of any kind.
+ **
+ ******************************************************************************
+ ** @attention
+ **
+ ** <h2><center>&copy; COPYRIGHT(c) 2025 STMicroelectronics</center></h2>
+ **
+ ** Redistribution and use in source and binary forms, with or without modification,
+ ** are permitted provided that the following conditions are met:
+ **   1. Redistributions of source code must retain the above copyright notice,
+ **      this list of conditions and the following disclaimer.
+ **   2. Redistributions in binary form must reproduce the above copyright notice,
+ **      this list of conditions and the following disclaimer in the documentation
+ **      and/or other materials provided with the distribution.
+ **   3. Neither the name of STMicroelectronics nor the names of its contributors
+ **      may be used to endorse or promote products derived from this software
+ **      without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ ** ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ ** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ ** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ ** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **
+ ******************************************************************************
+ */
 
 /* Entry Point */
 ENTRY(Reset_Handler)
@@ -55,8 +54,8 @@ ENTRY(Reset_Handler)
 /* Specify the memory areas */
 MEMORY
 {
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 32K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 128K
+  RAM   (xrw)      : ORIGIN = @RAM_ORIGIN@, LENGTH = @RAM_LENGTH@
+  FLASH (rx)       : ORIGIN = @IMAGE_FLASH_ORIGIN@, LENGTH = @IMAGE_FLASH_LENGTH@
 }
 
 /* Highest address of the user mode stack */
@@ -164,15 +163,36 @@ SECTIONS
     . = ALIGN(4);
   } >RAM AT> FLASH
 
- /* Initialized TLS data section */
+  /* Initialized TLS data section */
   .tdata : ALIGN(4)
   {
     *(.tdata .tdata.* .gnu.linkonce.td.*)
     . = ALIGN(4);
-    _edata = .;        /* define a global symbol at data end */
+    _edata = .;        /* create a global symbol at data end */
     PROVIDE(__data_end = .);
     PROVIDE(__tdata_end = .);
   } >RAM AT> FLASH
+
+  /* End of the loadable image in Flash.  Keep this list in sync when
+     adding another loadable Flash section. */
+  __flash_image_end = MAX(ADDR(.isr_vector) + SIZEOF(.isr_vector),
+                          _etext);
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.rodata) + SIZEOF(.rodata));
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.ARM.extab) + SIZEOF(.ARM.extab));
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.ARM) + SIZEOF(.ARM));
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.preinit_array) + SIZEOF(.preinit_array));
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.init_array) + SIZEOF(.init_array));
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.fini_array) + SIZEOF(.fini_array));
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.data) + SIZEOF(.data));
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.tdata) + SIZEOF(.tdata));
 
   PROVIDE( __tdata_start = ADDR(.tdata) );
   PROVIDE( __tdata_size = __tdata_end - __tdata_start );
@@ -187,11 +207,12 @@ SECTIONS
   PROVIDE( __data_source = LOADADDR(.data) );
   PROVIDE( __data_source_end = __tdata_source_end );
   PROVIDE( __data_source_size = __data_source_end - __data_source );
+
   /* Uninitialized data section */
   .tbss (NOLOAD) : ALIGN(4)
   {
-     /* This is used by the startup in order to initialize the .bss secion */
-    _sbss = .;         /* define a global symbol at bss start */
+    /* This is used by the startup in order to initialize the .bss section */
+    _sbss = .;         /* create a global symbol at bss start */
     __bss_start__ = _sbss;
     *(.tbss .tbss.*)
     . = ALIGN(4);
@@ -216,10 +237,10 @@ SECTIONS
     *(.bss*)
     *(COMMON)
 
-      . = ALIGN(4);
-    _ebss = .;         /* define a global symbol at bss end */
+    . = ALIGN(4);
+    _ebss = .;         /* create a global symbol at bss end */
     __bss_end__ = _ebss;
-      PROVIDE( __bss_end = .);
+    PROVIDE( __bss_end = .);
   } >RAM
   PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 
@@ -237,7 +258,27 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-
+  /* Link-time layout checks. */
+  ASSERT(ORIGIN(RAM) == @RAM_ORIGIN@,
+         "@IMAGE_NAME@ RAM origin does not match FlashLayout.h")
+  ASSERT(LENGTH(RAM) == @RAM_LENGTH@,
+         "@IMAGE_NAME@ RAM length does not match FlashLayout.h")
+  ASSERT(ORIGIN(FLASH) == @IMAGE_FLASH_ORIGIN@,
+         "@IMAGE_NAME@ FLASH origin does not match FlashLayout.h")
+  ASSERT(LENGTH(FLASH) == @IMAGE_FLASH_LENGTH@,
+         "@IMAGE_NAME@ FLASH length does not match FlashLayout.h")
+  ASSERT(ORIGIN(FLASH) + LENGTH(FLASH) == @IMAGE_FLASH_END@,
+         "@IMAGE_NAME@ FLASH must end at the configured layout boundary")
+  ASSERT(ADDR(.isr_vector) == ORIGIN(FLASH),
+         "@IMAGE_NAME@ vector table is not at FLASH origin")
+  ASSERT(LOADADDR(.isr_vector) == ORIGIN(FLASH),
+         "@IMAGE_NAME@ vector table load address is not at FLASH origin")
+  ASSERT((ADDR(.isr_vector) & @VECTOR_TABLE_ALIGNMENT_MASK@) == 0,
+         "@IMAGE_NAME@ vector table is not @VECTOR_TABLE_ALIGNMENT@-byte aligned")
+  ASSERT(SIZEOF(.isr_vector) > 0,
+         "@IMAGE_NAME@ vector table is empty")
+  ASSERT(__flash_image_end <= ORIGIN(FLASH) + LENGTH(FLASH),
+         "@IMAGE_NAME@ image exceeds its FLASH region")
 
   /* Remove information from the standard libraries */
   /DISCARD/ :

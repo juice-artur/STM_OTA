@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "FlashLayout.h"
 
 /* USER CODE END Includes */
 
