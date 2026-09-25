@@ -6,6 +6,10 @@
     "cmake.preferredGenerators": [
         "Ninja"
     ],
+    "C_Cpp.formatting": "clangFormat",
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
     "stm32cube-ide-clangd.path": "cube",
     "stm32cube-ide-clangd.arguments": [
         "starm-clangd",

@@ -1,0 +1,18 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Keep formatting compatible with STM32CubeMX-generated sources.
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Allman
+ColumnLimit: 80
+ContinuationIndentWidth: 1
+DeriveLineEnding: true
+IndentExternBlock: NoIndent
+IndentPPDirectives: None
+IndentWidth: 1
+PointerAlignment: Right
+ReflowComments: false
+SortIncludes: Never
+TabWidth: 1
+UseTab: ForIndentation
