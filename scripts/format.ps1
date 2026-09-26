@@ -50,7 +50,9 @@ try {
 
     $sourceFiles = @(
         $sourceFiles | Where-Object {
-            $_ -and $_ -notmatch "(^|/)(Drivers|build|cmake|ThirdParty)(/|$)"
+            $_ -and
+            (Test-Path -LiteralPath $_ -PathType Leaf) -and
+            $_ -notmatch "(^|/)(Drivers|build|cmake|ThirdParty)(/|$)"
         }
     )
 
