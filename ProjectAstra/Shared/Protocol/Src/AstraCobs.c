@@ -1,17 +1,17 @@
 #include "AstraCobs.h"
 
-static size_t AstraCobsMaxEncodedSize(size_t length)
+size_t AstraCobsMaxEncodedSize(size_t length)
 {
 	return length + (length / ASTRA_COBS_MAX_BLOCK_PAYLOAD) + 2u;
 }
 
 AstraCobsStatus AstraCobsEncode(const uint8_t *src, size_t length, uint8_t *dst,
-                                size_t dstCapacity)
+                                size_t dstCapacity, size_t *encodedSize)
 {
 	size_t readIndex = 0u;
 	size_t writeIndex = 0u;
 
-	if (dst == NULL || (src == NULL && length != 0u))
+	if (dst == NULL || encodedSize == NULL || (src == NULL && length != 0u))
 	{
 		return ASTRA_COBS_STATUS_ERROR;
 	}
@@ -54,6 +54,56 @@ AstraCobsStatus AstraCobsEncode(const uint8_t *src, size_t length, uint8_t *dst,
 	}
 
 	dst[writeIndex++] = ASTRA_COBS_DELIMITER;
+	*encodedSize = writeIndex;
+
+	return ASTRA_COBS_STATUS_OK;
+}
+
+AstraCobsStatus AstraCobsDecode(const uint8_t *src, size_t length, uint8_t *dst,
+                                size_t dstCapacity, size_t *decodedSize)
+{
+	size_t readIndex = 0u;
+	size_t writeIndex = 0u;
+	size_t run = 0u;
+	uint8_t code = 0u;
+
+	if (dst == NULL || decodedSize == NULL || (src == NULL && length != 0u))
+	{
+		return ASTRA_COBS_STATUS_ERROR;
+	}
+
+	while (readIndex < length && src[readIndex] != ASTRA_COBS_DELIMITER)
+	{
+		code = src[readIndex];
+		++readIndex;
+		run = (size_t)code - 1u;
+
+		if (run > (length - readIndex) || run > (dstCapacity - writeIndex))
+		{
+			return ASTRA_COBS_STATUS_ERROR;
+		}
+
+		for (size_t offset = 0u; offset < run; ++offset)
+		{
+			dst[writeIndex + offset] = src[readIndex + offset];
+		}
+
+		readIndex += run;
+		writeIndex += run;
+
+		if (code < (ASTRA_COBS_MAX_BLOCK_PAYLOAD + 1u) && readIndex < length &&
+		    src[readIndex] != ASTRA_COBS_DELIMITER)
+		{
+			if (writeIndex >= dstCapacity)
+			{
+				return ASTRA_COBS_STATUS_ERROR;
+			}
+
+			dst[writeIndex++] = ASTRA_COBS_DELIMITER;
+		}
+	}
+
+	*decodedSize = writeIndex;
 
 	return ASTRA_COBS_STATUS_OK;
 }
