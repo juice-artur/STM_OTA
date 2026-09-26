@@ -2,5 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "AstraCobsEnums.h"
 
-size_t AstraCobsEncode(const void *src, size_t length, void *dst);
+AstraCobsStatus AstraCobsEncode(const uint8_t *src, size_t length, uint8_t *dst,
+                                size_t dstCapacity);
