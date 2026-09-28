@@ -46,6 +46,11 @@ astra_configure_flash_layout(
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
+# Core/Src/system_stm32g4xx.c includes the generated FlashLayout.h to relocate
+# the vector table.  Keep this here instead of in the CubeMX-generated file so
+# it survives regeneration.
+target_include_directories(stm32cubemx INTERFACE "${ASTRA_GENERATED_DIR}")
+
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths

@@ -22,7 +22,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "FlashLayout.h"
-
+#include "stm32g4xx_hal.h"
+#include "stm32g4xx_hal_gpio.h"
+#include "bootloaderJump.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,6 +98,15 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  for (uint32_t blink = 0U; blink < 3U; blink++)
+	{
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_9);
+		HAL_Delay(500);
+	}
+
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+	JumpToApplication();
+
 	while (1)
 	{
     /* USER CODE END WHILE */
@@ -220,7 +231,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PB9 */
+  /*Configure GPIO pin : BOOTLOADER_STATUS_LED_Pin */
   GPIO_InitStruct.Pin = GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

@@ -31,5 +31,48 @@
             "--query-driver=${env:CUBE_BUNDLE_PATH}/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-gcc*",
             "--query-driver=${env:CUBE_BUNDLE_PATH}/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-g++*"
         ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Build: both projects (Debug)",
+                "dependsOrder": "sequence",
+                "dependsOn": [
+                    "AstraBootloader: build (Debug)",
+                    "AstraApplication: build (Debug)"
+                ],
+                "group": "build",
+                "problemMatcher": []
+            },
+            {
+                "label": "Build: both projects (Release)",
+                "dependsOrder": "sequence",
+                "dependsOn": [
+                    "AstraBootloader: build (Release)",
+                    "AstraApplication: build (Release)"
+                ],
+                "group": "build",
+                "problemMatcher": []
+            },
+            {
+                "label": "Flash: both projects (Debug)",
+                "dependsOrder": "sequence",
+                "dependsOn": [
+                    "AstraBootloader: flash (Debug)",
+                    "AstraApplication: flash (Debug)"
+                ],
+                "problemMatcher": []
+            },
+            {
+                "label": "Flash: both projects (Release)",
+                "dependsOrder": "sequence",
+                "dependsOn": [
+                    "AstraBootloader: flash (Release)",
+                    "AstraApplication: flash (Release)"
+                ],
+                "problemMatcher": []
+            }
+        ]
     }
 }

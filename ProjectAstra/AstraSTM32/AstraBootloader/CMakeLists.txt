@@ -48,17 +48,17 @@ add_subdirectory(cmake/stm32cubemx)
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined library search paths
 )
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
+    BootloaderCore/Src/bootloaderJump.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     "${ASTRA_GENERATED_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootloaderCore/Include"
 )
 
 # Add project symbols (macros)
