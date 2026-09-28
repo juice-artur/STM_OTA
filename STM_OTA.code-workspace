@@ -9,6 +9,10 @@
             "path": "ProjectAstra/AstraSTM32/AstraBootloader"
         },
         {
+            "name": "Common",
+            "path": "ProjectAstra/AstraSTM32/Common"
+        },
+        {
             "name": "Protocol",
             "path": "ProjectAstra/Shared/Protocol"
         }
