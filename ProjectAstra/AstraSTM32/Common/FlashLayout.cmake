@@ -220,14 +220,29 @@ function(astra_configure_flash_layout)
 
     "  /* One complete Flash page reserved for the image header, defined in
          Shared/Image/Src/AppHeader.c.  KEEP() protects it from --gc-sections,
-         which is enabled for this target. */
+         which is enabled for this target.
+
+         The page is padded with real zero bytes instead of being left
+         undefined.  scripts/astra_image.py computes the header CRC over a
+         gap-filled binary, so every byte of the page must be deterministic
+         for an ELF programmed directly by a debug adapter to yield the same
+         CRC as the packed .bin. */
       .header ORIGIN(APPHEADER) :
       {
         . = ALIGN(4);
         KEEP(*(.header))
         . = ALIGN(4);
+        FILL(0x00);
+        . = ORIGIN(APPHEADER) + LENGTH(APPHEADER);
       } >APPHEADER
-    
+
+      /* Read back from the ELF by scripts/astra_image.py to derive the image
+         size and the CRC range.  These must be plain assignments: PROVIDE()
+         omits a definition unless something references it, and the only
+         consumer is an external tool, not the linker itself. */
+      __app_header_addr = ORIGIN(APPHEADER);
+      __app_image_start = ORIGIN(FLASH);
+
       ASSERT(ORIGIN(APPHEADER) == ${BOOTLOADER_END_ADDR},
              \"${FLASH_LAYOUT_IMAGE_NAME} application header must follow the bootloader\")
       ASSERT(ORIGIN(APPHEADER) + LENGTH(APPHEADER) == ORIGIN(FLASH),
