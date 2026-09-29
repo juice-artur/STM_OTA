@@ -2,8 +2,17 @@
 
 #include <stdbool.h>
 
+typedef enum
+{
+   APPLICATION_VALID,
+	APPLICATION_ERR_MAGIC,
+	APPLICATION_ERR_RESET_HANDLER,
+	APPLICATION_ERR_STACK_POINTER,
+} ApplicationStatus_t;
+
+
 typedef void (*pFunction)(void);
 
-/* Hands control over to the application.  Never returns; only call it after
-   IsApplicationValid() returned true. */
 void JumpToApplication(void);
+
+ApplicationStatus_t IsApplicationValid(void);

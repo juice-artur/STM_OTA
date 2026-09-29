@@ -207,6 +207,35 @@ function(astra_configure_flash_layout)
                 "astra_configure_flash_layout: inconsistent ${FLASH_LAYOUT_IMAGE_REGION} Flash range")
     endif()
 
+    set(IMAGE_HEADER_REGION "")
+    set(IMAGE_HEADER_TERM   "0")
+    set(IMAGE_HEADER_SECTION "")
+
+        if("${FLASH_LAYOUT_IMAGE_REGION}" STREQUAL "APPLICATION")
+        set(IMAGE_HEADER_REGION
+            "  APPHEADER (rx)   : ORIGIN = ${APP_HEADER_ADDR}, LENGTH = ${APP_HEADER_SIZE}")
+        set(IMAGE_HEADER_TERM
+            "LOADADDR(.header) + SIZEOF(.header)")
+        set(IMAGE_HEADER_SECTION
+
+    "  /* One complete Flash page reserved for the image header, defined in
+         Shared/Image/Src/AppHeader.c.  KEEP() protects it from --gc-sections,
+         which is enabled for this target. */
+      .header ORIGIN(APPHEADER) :
+      {
+        . = ALIGN(4);
+        KEEP(*(.header))
+        . = ALIGN(4);
+      } >APPHEADER
+    
+      ASSERT(ORIGIN(APPHEADER) == ${BOOTLOADER_END_ADDR},
+             \"${FLASH_LAYOUT_IMAGE_NAME} application header must follow the bootloader\")
+      ASSERT(ORIGIN(APPHEADER) + LENGTH(APPHEADER) == ORIGIN(FLASH),
+             \"${FLASH_LAYOUT_IMAGE_NAME} application header must end at the vector table\")
+    ")
+
+    endif()
+
     set(_generated_dir "${FLASH_LAYOUT_GENERATED_DIR}")
     file(MAKE_DIRECTORY "${_generated_dir}")
 

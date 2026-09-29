@@ -101,10 +101,19 @@ int main(void)
   for (uint32_t blink = 0U; blink < 3U; blink++)
 	{
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_9);
-		HAL_Delay(500);
+		HAL_Delay(1000);
 	}
 
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+  ApplicationStatus_t status = IsApplicationValid();
+  if (status  != APPLICATION_VALID) 
+  {
+    while (1)
+    {
+        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_9);
+        HAL_Delay(100);
+    }
+  }
 	JumpToApplication();
 
 	while (1)

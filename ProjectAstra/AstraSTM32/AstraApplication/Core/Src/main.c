@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "FlashLayout.h"
+#include "AppHeader.h"
 
 /* USER CODE END Includes */
 
@@ -66,7 +67,8 @@ int main(void)
 {
 
 	/* USER CODE BEGIN 1 */
-
+	//Only for properly linker work
+	(void)GetAppHeader();
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/

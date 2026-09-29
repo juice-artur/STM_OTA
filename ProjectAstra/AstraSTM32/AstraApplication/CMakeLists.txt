@@ -33,6 +33,7 @@ enable_language(C ASM)
 
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/Image/AstraImage.cmake")
 
 # Generate the shared FlashLayout.h and this target's linker script.
 include("${CMAKE_CURRENT_SOURCE_DIR}/../Common/FlashLayout.cmake")
@@ -77,6 +78,5 @@ list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
-
-    # Add user defined libraries
+    AstraImage
 )

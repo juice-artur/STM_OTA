@@ -5,6 +5,35 @@
 #include "stm32g4xx.h"
 #include "stm32g4xx_hal.h"
 #include "FlashLayout.h"
+#include "AppHeader.h"
+
+
+ApplicationStatus_t IsApplicationValid(void)
+{
+	AppHeader_t const * const header = (AppHeader_t const *)APP_HEADER_ADDR;
+
+    if (header->magic != ASTRA_MAGIC_VALUE)
+	{
+		return APPLICATION_ERR_MAGIC;
+	}
+
+	uint32_t const stack = *(volatile uint32_t const *)APP_VECTOR_TABLE_ADDR;
+	uint32_t const reset = *(volatile uint32_t const *)(APP_VECTOR_TABLE_ADDR + 4U);
+
+	if ((reset & 1U) == 0U || (reset & ~1U) < APP_START_ADDR ||
+	    (reset & ~1U) >= APP_SLOT_END_ADDR)
+	{
+		return APPLICATION_ERR_RESET_HANDLER;
+	}
+
+	if (stack < RAM_ORIGIN || stack > RAM_ORIGIN + RAM_LENGTH)
+	{
+		return APPLICATION_ERR_STACK_POINTER;
+	}
+
+	return APPLICATION_VALID;   
+}
+
 
 void JumpToApplication(void)
 {

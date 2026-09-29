@@ -56,6 +56,7 @@ MEMORY
 {
   RAM   (xrw)      : ORIGIN = @RAM_ORIGIN@, LENGTH = @RAM_LENGTH@
   FLASH (rx)       : ORIGIN = @IMAGE_FLASH_ORIGIN@, LENGTH = @IMAGE_FLASH_LENGTH@
+  @IMAGE_HEADER_REGION@
 }
 
 /* Highest address of the user mode stack */
@@ -68,6 +69,8 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Define output sections */
 SECTIONS
 {
+  @IMAGE_HEADER_SECTION@
+
   /* The startup code goes first into FLASH */
   .isr_vector :
   {
@@ -172,6 +175,11 @@ SECTIONS
     PROVIDE(__data_end = .);
     PROVIDE(__tdata_end = .);
   } >RAM AT> FLASH
+
+  __flash_image_end = MAX(__flash_image_end,
+                          LOADADDR(.tdata) + SIZEOF(.tdata));
+
+  __flash_image_end = MAX(__flash_image_end, @IMAGE_HEADER_TERM@);
 
   /* End of the loadable image in Flash.  Keep this list in sync when
      adding another loadable Flash section. */
