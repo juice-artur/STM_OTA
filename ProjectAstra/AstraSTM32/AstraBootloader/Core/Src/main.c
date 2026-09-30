@@ -25,6 +25,7 @@
 #include "stm32g4xx_hal.h"
 #include "stm32g4xx_hal_gpio.h"
 #include "bootloaderJump.h"
+#include "OtaRequest.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -106,7 +107,8 @@ int main(void)
 
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
   ApplicationStatus_t status = IsApplicationValid();
-  if (status  != APPLICATION_VALID) 
+
+  if ((status != APPLICATION_VALID) || IsOtaRequested())
   {
     while (1)
     {

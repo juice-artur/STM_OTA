@@ -37,8 +37,9 @@ import tempfile
 import zlib
 
 HEADER_MAGIC = 0x52545341
-HEADER_STRUCT = "<IIII"
-HEADER_STRUCT_SIZE = 16
+HEADER_STRUCT = "<IIIII"
+HEADER_STRUCT_SIZE = 20
+OTA_NOT_REQUESTED = 0
 
 IMAGE_END_SYMBOL = "__flash_image_end"
 
@@ -128,7 +129,9 @@ def flatten(objcopy, elf, binary):
 
 def build_header(size, crc, version):
     """Return the packed AppHeader_t."""
-    return struct.pack(HEADER_STRUCT, HEADER_MAGIC, size, crc, version)
+    return struct.pack(
+        HEADER_STRUCT, HEADER_MAGIC, size, crc, version, OTA_NOT_REQUESTED
+    )
 
 
 def verify(image, label, offset, size, crc, version):
@@ -136,7 +139,7 @@ def verify(image, label, offset, size, crc, version):
     if len(image) < HEADER_STRUCT_SIZE:
         raise ImageError("{}: image is shorter than the header".format(label))
 
-    magic, image_size, image_crc, image_version = struct.unpack(
+    magic, image_size, image_crc, image_version, ota_request = struct.unpack(
         HEADER_STRUCT, image[0:HEADER_STRUCT_SIZE]
     )
 
@@ -155,6 +158,12 @@ def verify(image, label, offset, size, crc, version):
     if image_version != version:
         raise ImageError(
             "{}: version is {}, expected {}".format(label, image_version, version)
+        )
+    if ota_request != OTA_NOT_REQUESTED:
+        raise ImageError(
+            "{}: otaRequest is {}, expected {} for a freshly built image".format(
+                label, ota_request, OTA_NOT_REQUESTED
+            )
         )
 
     code = image[offset:offset + size]

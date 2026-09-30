@@ -36,6 +36,7 @@ enable_language(C ASM)
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/Image/AstraImage.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/AstraFlash/AstraFlash.cmake")
 
 # Generate the shared FlashLayout.h and this target's linker script.
 include("${CMAKE_CURRENT_SOURCE_DIR}/../Common/FlashLayout.cmake")
@@ -45,6 +46,8 @@ astra_configure_flash_layout(
     IMAGE_REGION "APPLICATION"
     GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated"
 )
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/Ota/AstraOta.cmake")
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -62,13 +65,11 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-    ApplicationCore/Src/OtaRequest.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     "${ASTRA_GENERATED_DIR}"
-     ApplicationCore/Include/OtaRequest.h
 )
 
 # Add project symbols (macros)
@@ -83,6 +84,8 @@ list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
     AstraImage
+    AstraFlash
+    AstraOta
 )
 
 

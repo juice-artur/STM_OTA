@@ -46,6 +46,9 @@ astra_configure_flash_layout(
     GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated"
 )
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/AstraFlash/AstraFlash.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/Ota/AstraOta.cmake")
+
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
@@ -77,4 +80,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
     AstraCrc32
     AstraImage
+    AstraFlash
+    AstraOta
 )
