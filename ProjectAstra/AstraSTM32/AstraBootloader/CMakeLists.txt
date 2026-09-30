@@ -21,6 +21,8 @@ endif()
 # Set the project name
 set(CMAKE_PROJECT_NAME AstraBootloader)
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/Image/AstraImage.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/Crc/AstraCrc32.cmake")
+
 
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
@@ -53,16 +55,13 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    BootloaderCore/Src/AstraCrc32.c
     BootloaderCore/Src/bootloaderJump.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     "${ASTRA_GENERATED_DIR}"
-    "${CMAKE_CURRENT_SOURCE_DIR}/BootloaderCore/Include"
-   
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../Shared/Image/Include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootloaderCore/Include"   
 )
 
 # Add project symbols (macros)
@@ -76,4 +75,6 @@ list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
+    AstraCrc32
+    AstraImage
 )

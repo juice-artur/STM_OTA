@@ -62,11 +62,13 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+    ApplicationCore/Src/OtaRequest.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     "${ASTRA_GENERATED_DIR}"
+     ApplicationCore/Include/OtaRequest.h
 )
 
 # Add project symbols (macros)
